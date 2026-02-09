@@ -1,0 +1,7 @@
+# Server: Google STT/TTS, Azure LLM
+pipecat-ai[google,azure,silero,webrtc,runner]==0.0.101
+opencv-python-headless
+python-dotenv>=1.0.0
+loguru>=0.7.0
+fastapi>=0.115.0
+uvicorn>=0.32.0
