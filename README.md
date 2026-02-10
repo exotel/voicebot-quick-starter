@@ -115,6 +115,30 @@ python exotel_runner.py
 
 The bot starts a WebSocket server ready to accept Exotel voice streams at 8kHz.
 
+To place a call that connects your phone to the bot, use the Exotel Connect API:
+
+```bash
+curl -k -X POST \
+  'https://<API_KEY>:<API_TOKEN>@api.exotel.com/v1/Accounts/<ACCOUNT_SID>/Calls/connect.json' \
+  -F 'StreamType=bidirectional' \
+  -F 'StreamUrl=<NGROK_PUBLIC_URL>/ws' \
+  -F 'From=<YOUR_PHONE_NUMBER>' \
+  -F 'CallerId=<YOUR_EXOPHONE>' \
+  -F 'Record=true'
+```
+
+Replace the placeholders:
+
+| Placeholder | Description |
+|-------------|-------------|
+| `<API_KEY>:<API_TOKEN>` | Your Exotel API credentials (found in the Exotel dashboard) |
+| `<ACCOUNT_SID>` | Your Exotel account SID |
+| `<NGROK_PUBLIC_URL>` | The public URL from ngrok (e.g., `wss://abcd1234.ngrok-free.app`) |
+| `<YOUR_PHONE_NUMBER>` | The phone number that will receive the call |
+| `<YOUR_EXOPHONE>` | The Exophone (virtual number) you purchased from Exotel |
+
+You'll receive a call on your phone — once you pick up, you'll be talking to the bot.
+
 ## Google Cloud Setup
 
 1. Create a GCP project and enable the required APIs:
@@ -137,6 +161,18 @@ Edit `bot.py` to customize:
 - **LLM model** — Currently using `gemini-2.5-flash-lite`; swap for other Gemini models as needed
 - **TTS voice** — Currently using `en-US-Chirp3-HD-Charon`; see [available voices](https://cloud.google.com/text-to-speech/docs/chirp3-hd)
 - **VAD sensitivity** — Adjust `stop_secs` in `VADParams` for turn-taking timing
+
+### Swap in Your Preferred STT, LLM, or TTS
+
+Pipecat supports a wide range of providers. You can replace any component in the pipeline by swapping the service class in `bot.py`. Refer to the examples in the Pipecat repo for guidance:
+
+| Component | Supported Providers | Examples |
+|-----------|-------------------|----------|
+| **STT** | Deepgram, AssemblyAI, Whisper, Azure, Google | [STT examples](https://github.com/pipecat-ai/pipecat/tree/main/examples/foundational) |
+| **LLM** | OpenAI, Anthropic, Google Gemini, Azure, Groq | [LLM examples](https://github.com/pipecat-ai/pipecat/tree/main/examples/foundational) |
+| **TTS** | Cartesia, ElevenLabs, PlayHT, Deepgram, Google, Azure | [TTS examples](https://github.com/pipecat-ai/pipecat/tree/main/examples/foundational) |
+
+For the full list of supported services, see the [Pipecat services documentation](https://docs.pipecat.ai/server/services/overview).
 
 ## Deployment
 
