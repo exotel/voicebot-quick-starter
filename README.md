@@ -20,7 +20,7 @@ A minimal, production-ready voice bot built with [Pipecat](https://github.com/pi
 │  Input   │     │ STT     │     │  LLM      │     │ TTS     │     │  Output  │
 └──────────┘     └─────────┘     └───────────┘     └─────────┘     └──────────┘
    WebRTC         Chirp 3        Flash Lite 2.5     Chirp3-HD        WebRTC
-   or Exotel     (asia-south1)   (Vertex AI)       (asia-south1)    or Exotel
+   or Exotel                     (Vertex AI)                        or Exotel
 ```
 
 ## Project Structure
