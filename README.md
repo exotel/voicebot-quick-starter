@@ -129,7 +129,7 @@ To place a call that connects your phone to the agent, use the Exotel Connect AP
 
 ```bash
 curl -k -X POST \
-  'https://<API_KEY>:<API_TOKEN>@api.exotel.com/v1/Accounts/<ACCOUNT_SID>/Calls/connect.json' \
+  'https://<API_KEY>:<API_TOKEN>@api-stream.exotel.com/v1/Accounts/<ACCOUNT_SID>/Calls/connect.json' \
   -F 'StreamType=bidirectional' \
   -F 'StreamUrl=<NGROK_PUBLIC_URL>/ws' \
   -F 'From=<YOUR_PHONE_NUMBER>' \
