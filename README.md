@@ -1,13 +1,13 @@
-# Voicebot Quick Starter
+# Voice AI Agent — Quick Starter
 
-A minimal, production-ready voice bot built with [Pipecat](https://github.com/pipecat-ai/pipecat) that wires up **Google Cloud STT + Gemini LLM + Google Cloud TTS** into a conversational voice pipeline — over both **WebRTC** (browser) and **Exotel telephony** (phone calls).
+A minimal, production-ready Voice AI Agent built with [Pipecat](https://github.com/pipecat-ai/pipecat) that wires up **Google Cloud STT + Gemini LLM + Google Cloud TTS** into a conversational voice pipeline — over both **WebRTC** (browser) and **Exotel telephony** (phone calls).
 
-## What This Bot Does
+## What This Agent Does
 
 - **Speech-to-Text**: Google Cloud STT (Chirp 3) for accurate real-time transcription
 - **LLM**: Google Gemini 2.5 Flash Lite via Vertex AI for fast, conversational responses
 - **Text-to-Speech**: Google Cloud TTS (Chirp3-HD) for natural-sounding voice output
-- **WebRTC**: Talk to the bot directly from your browser
+- **WebRTC**: Talk to the agent directly from your browser
 - **Exotel Telephony**: Receive phone calls and converse via Exotel's WebSocket streaming
 - **Voice Activity Detection**: Silero VAD for natural turn-taking (200ms stop threshold)
 - **Metrics**: Built-in pipeline and usage metrics
@@ -26,7 +26,7 @@ A minimal, production-ready voice bot built with [Pipecat](https://github.com/pi
 ## Project Structure
 
 ```
-.
+voicebot-quick-starter/
 ├── bot.py              # Core pipeline: STT → LLM → TTS
 ├── default_runner.py   # WebRTC runner — browser-based voice chat
 ├── exotel_runner.py    # Exotel runner — telephony via WebSocket
@@ -84,22 +84,28 @@ A minimal, production-ready voice bot built with [Pipecat](https://github.com/pi
 
 3. **Install dependencies:**
 
+   Run from the `voicebot-quick-starter/` directory:
+
    ```bash
    pip install -r requirements.txt
    ```
 
 4. **Configure environment variables:**
 
-   Create a `.env` file in the project root:
+   Create a `.env` file inside the `voicebot-quick-starter/` directory:
 
    ```bash
    # Google Cloud credentials (STT, LLM, TTS)
    GOOGLE_APPLICATION_CREDENTIALS=./your-service-account.json
    ```
 
-### Running the Bot
+   Place your GCP service account JSON file in the same `voicebot-quick-starter/` directory and update the path accordingly.
+
+### Running the Agent
 
 #### Option 1: WebRTC (Browser)
+
+Run from the `voicebot-quick-starter/` directory:
 
 ```bash
 python default_runner.py
@@ -109,13 +115,17 @@ Open **http://localhost:7860/client** in your browser and click **Connect**.
 
 #### Option 2: Exotel Telephony
 
+Running the Exotel runner locally requires a public URL so that Exotel can reach your machine. Set up ngrok first — see [ngrok Setup](#ngrok-setup) below.
+
+Once ngrok is running, start the agent from the `voicebot-quick-starter/` directory:
+
 ```bash
 python exotel_runner.py
 ```
 
-The bot starts a WebSocket server ready to accept Exotel voice streams at 8kHz.
+The agent starts a WebSocket server ready to accept Exotel voice streams at 8kHz.
 
-To place a call that connects your phone to the bot, use the Exotel Connect API:
+To place a call that connects your phone to the agent, use the Exotel Connect API:
 
 ```bash
 curl -k -X POST \
@@ -137,7 +147,26 @@ Replace the placeholders:
 | `<YOUR_PHONE_NUMBER>` | The phone number that will receive the call |
 | `<YOUR_EXOPHONE>` | The Exophone (virtual number) you purchased from Exotel |
 
-You'll receive a call on your phone — once you pick up, you'll be talking to the bot.
+You'll receive a call on your phone — once you pick up, you'll be talking to the agent.
+
+## ngrok Setup
+
+ngrok exposes your local server to the internet, which is required for the Exotel runner to receive incoming voice streams.
+
+1. Install ngrok by following the steps at [https://ngrok.com/download](https://ngrok.com/download)
+2. Add your authtoken (sign up for a free account at [ngrok.com](https://ngrok.com) if you don't have one):
+
+   ```bash
+   ngrok config add-authtoken <your-authtoken>
+   ```
+
+3. Expose your local server:
+
+   ```bash
+   ngrok http 7860
+   ```
+
+4. Copy the public `https://` URL from the ngrok output — use this as the `<NGROK_PUBLIC_URL>` in the Exotel curl command above (replace `https://` with `wss://` and append `/ws`).
 
 ## Google Cloud Setup
 
@@ -149,13 +178,14 @@ You'll receive a call on your phone — once you pick up, you'll be talking to t
    - `roles/speech.client` — Speech-to-Text
    - `roles/aiplatform.user` — Vertex AI (Gemini LLM)
 3. Download the service account JSON key
-4. Set `GOOGLE_APPLICATION_CREDENTIALS` in `.env` to point to it
+4. Place the JSON file inside the `voicebot-quick-starter/` directory
+5. Set `GOOGLE_APPLICATION_CREDENTIALS` in `voicebot-quick-starter/.env` to point to it
 
-## Customizing the Bot
+## Customizing the Agent
 
-Edit `bot.py` to customize:
+Edit `voicebot-quick-starter/bot.py` to customize:
 
-- **System prompt** — Change the bot's personality and behavior
+- **System prompt** — Change the agent's personality and behavior
 - **STT region** — Currently set to `asia-south1` (Mumbai)
 - **STT model** — Currently using `chirp_3`
 - **LLM model** — Currently using `gemini-2.5-flash-lite`; swap for other Gemini models as needed
@@ -175,15 +205,6 @@ Pipecat supports a wide range of providers. You can replace any component in the
 For the full list of supported services, see the [Pipecat services documentation](https://docs.pipecat.ai/server/services/overview).
 
 ## Deployment
-
-### Development (ngrok)
-
-Install ngrok by following the steps at [https://ngrok.com/download](https://ngrok.com/download), then expose your local server:
-
-```bash
-ngrok http 7860
-# Use the wss:// URL in your Exotel Voicebot Applet
-```
 
 ### Production
 
@@ -210,7 +231,7 @@ Deploy to any cloud provider (GCP, AWS, etc.) and ensure:
 ### No Audio Output
 
 - Ensure your browser allows microphone access (WebRTC mode)
-- Check that `GOOGLE_APPLICATION_CREDENTIALS` points to a valid service account JSON
+- Check that `GOOGLE_APPLICATION_CREDENTIALS` in `voicebot-quick-starter/.env` points to a valid service account JSON
 - Review the terminal logs for `ErrorFrame` messages
 
 ### High Latency
@@ -219,7 +240,7 @@ Deploy to any cloud provider (GCP, AWS, etc.) and ensure:
 
 ### Exotel Connection Issues
 
-- Verify the WebSocket URL is publicly accessible (use ngrok for local dev)
+- Verify ngrok is running and the WebSocket URL is publicly accessible (see [ngrok Setup](#ngrok-setup))
 
 ## License
 
